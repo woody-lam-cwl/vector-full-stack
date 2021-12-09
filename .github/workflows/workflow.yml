@@ -10,6 +10,10 @@ jobs:
       matrix:
         node-version: [16.x]
 
+    defaults:
+      run:
+        working-directory: ./full-stack-app
+
     steps:
       - uses: actions/checkout@v2
       - run: cd full-stack-app
