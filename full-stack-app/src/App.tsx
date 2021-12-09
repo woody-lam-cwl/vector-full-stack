@@ -1,18 +1,12 @@
 import React from 'react';
+import CardContainer from './components/cardContainer';
 import data from './res/data.json';
-
-import Card from './components/card';
 
 function App() {
     return (
         <div>
-            {data.map((value) => (
-                <Card
-                    type={value.type}
-                    title={value.title}
-                    position={value.position}
-                />
-            ))}
+            <CardContainer cards={data.slice(0, 3)} />
+            <CardContainer cards={data.slice(3, 5)} />
         </div>
     );
 }

@@ -8,7 +8,7 @@ Part I
 
 [v] Load static JSON data
 
-[ ] Display cards correctly
+[v] Display cards correctly
 
 [ ] Display placeholder spinner for loading image
 
