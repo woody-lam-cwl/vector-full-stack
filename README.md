@@ -4,9 +4,9 @@ Tasks
 
 Part I
 
-[ ] Create CI Pipeline
+[v] Create CI Pipeline
 
-[ ] Load static JSON data
+[v] Load static JSON data
 
 [ ] Display cards correctly
 
