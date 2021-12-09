@@ -4,7 +4,7 @@ Tasks
 
 Part I
 
-[ ] Create CD Pipeline
+[ ] Create CI Pipeline
 
 [ ] Load static JSON data
 
