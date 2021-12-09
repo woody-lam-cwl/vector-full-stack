@@ -15,8 +15,7 @@ jobs:
         working-directory: ./full-stack-app
 
     steps:
-      - uses: actions/checkout@v2
-      - run: cd full-stack-app
+      - uses: actions/checkout@v
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v2
         with:
