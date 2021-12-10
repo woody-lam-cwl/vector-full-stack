@@ -1,19 +1,27 @@
 # vector-full-stack
 
-Tasks
+## Front End
 
-Part I
+Prerequisite: `npm` required to run the code locally.
 
-[v] Create CI Pipeline
+After cloning the repository, run `npm install` in project directory (`~\full-stack-app\`) to instal dependencies locally.
 
-[v] Load static JSON data
+Then, run `npm start` to host project [locally on port 3000](https://localhost:3000).
 
-[v] Display cards correctly
+## Tasks List
 
-[v] Display placeholder spinner for loading image
+#### Part I
 
-[v] Reorder cards by drag and drop
+[x] Create CI Pipeline
 
-[v] Create overlay feature
+[x] Load static JSON data
 
-[ ] Write README file
+[x] Display cards correctly
+
+[x] Display placeholder spinner for loading image
+
+[x] Reorder cards by drag and drop
+
+[x] Create overlay feature
+
+[x] Write README file
