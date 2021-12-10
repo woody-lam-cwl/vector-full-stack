@@ -4,7 +4,13 @@ import Card from './card';
 
 const CardContainer = (props: CardContainerProps) => {
     return (
-        <div style={{ display: 'flex', justifyContent: 'center' }}>
+        <div
+            style={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                justifyContent: 'center',
+            }}
+        >
             {props.cards.map((value) => (
                 <Card
                     type={value.type}
