@@ -1,6 +1,5 @@
 import React from 'react';
 import Card from './components/card';
-import CardContainer from './components/cardContainer';
 import data from './res/data.json';
 
 function App() {
