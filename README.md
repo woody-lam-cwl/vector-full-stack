@@ -10,7 +10,7 @@ Part I
 
 [v] Display cards correctly
 
-[ ] Display placeholder spinner for loading image
+[v] Display placeholder spinner for loading image
 
 [ ] Reorder cards by drag and drop
 
