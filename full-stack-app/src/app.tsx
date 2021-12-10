@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { DragDropContext, DropResult } from 'react-beautiful-dnd';
 import CardRowContainer from './components/cardRowContainer';
 import CardProps from './interfaces/cardProps';
 import data from './res/data.json';
@@ -6,13 +7,12 @@ import data from './res/data.json';
 const cardRowsStyle: React.CSSProperties = {
     display: 'flex',
     flexDirection: 'column',
-    alignItems: 'center',
 };
 
 const sortCard = (cards: CardProps[]) =>
     cards.sort((x, y) => (x.position > y.position ? 1 : -1));
 
-const numberOfRows = (length: number) => (length + 2) / 3;
+const numberOfRows = (length: number) => ((length + 2) / 3) >> 0;
 
 const cardsInRows = (cards: CardProps[]) => {
     var rows: CardProps[][] = [];
@@ -23,14 +23,30 @@ const cardsInRows = (cards: CardProps[]) => {
 };
 
 const App = () => {
-    //eslint-disable-next-line
-    const [cards, setCards] = useState(sortCard(data));
+    const [cards, updateCards] = useState(sortCard(data));
+
+    const dragEnd = (result: DropResult) => {
+        var cardsClone = [...cards];
+        const sourceIndex = result.source?.index;
+        const destinationIndex = result.destination?.index;
+        if (sourceIndex === undefined || destinationIndex === undefined) return;
+        cardsClone[sourceIndex].position = destinationIndex;
+        cardsClone[destinationIndex].position = sourceIndex;
+        updateCards(sortCard(cardsClone));
+    };
+
     return (
-        <div style={cardRowsStyle}>
-            {cardsInRows(cards).map((cards) => (
-                <CardRowContainer cards={cards} />
-            ))}
-        </div>
+        <DragDropContext onDragEnd={dragEnd}>
+            <div style={cardRowsStyle}>
+                {cardsInRows(cards).map((cards, index) => (
+                    <CardRowContainer
+                        key={index}
+                        cards={cards}
+                        rowIndex={index}
+                    />
+                ))}
+            </div>
+        </DragDropContext>
     );
 };
 

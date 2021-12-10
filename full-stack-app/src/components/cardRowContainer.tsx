@@ -1,4 +1,5 @@
 import React from 'react';
+import { Droppable } from 'react-beautiful-dnd';
 import CardRowContainerProps from '../interfaces/cardRowContainerProps';
 import Card from './card';
 
@@ -8,15 +9,28 @@ const containerStyle: React.CSSProperties = {
 
 const CardRowContainer = (props: CardRowContainerProps) => {
     return (
-        <div style={containerStyle}>
-            {props.cards.map((card) => (
-                <Card
-                    type={card.type}
-                    title={card.title}
-                    position={card.position}
-                />
-            ))}
-        </div>
+        <Droppable
+            droppableId={'cardRow-' + props.rowIndex}
+            direction="horizontal"
+        >
+            {(provided, snapshot) => (
+                <div
+                    ref={provided.innerRef}
+                    {...provided.droppableProps}
+                    style={containerStyle}
+                >
+                    {props.cards.map((card) => (
+                        <Card
+                            key={card.type}
+                            type={card.type}
+                            title={card.title}
+                            position={card.position}
+                        />
+                    ))}
+                    {provided.placeholder}
+                </div>
+            )}
+        </Droppable>
     );
 };
 
