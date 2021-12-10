@@ -2,6 +2,17 @@ import React, { useState } from 'react';
 import Loader from 'react-loader-spinner';
 import ImageProps from '../interfaces/imageProps';
 
+const spinnerDivStyle: React.CSSProperties = {
+    height: '80%',
+    alignItems: 'center',
+    justifyContent: 'center',
+};
+
+const imageStyle: React.CSSProperties = {
+    width: '80%',
+    aspectRatio: '1/1',
+};
+
 const Image = (props: ImageProps) => {
     const [loading, setLoading] = useState(true);
 
@@ -17,28 +28,21 @@ const Image = (props: ImageProps) => {
             <div
                 style={{
                     display: loading ? 'flex' : 'none',
-                    height: '80%',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    pointerEvents: 'none',
+                    ...spinnerDivStyle,
                 }}
             >
                 <Loader
                     type="TailSpin"
                     color="#BFBFBF"
-                    height="40%"
-                    width="40%"
+                    height="8vw"
+                    width="8vw"
                 ></Loader>
             </div>
             <div style={{ display: loading ? 'none' : 'block' }}>
                 <img
                     src={'/images/' + props.type + '.gif'}
                     alt={props.type}
-                    style={{
-                        width: '80%',
-                        aspectRatio: '1/1',
-                        pointerEvents: 'none',
-                    }}
+                    style={imageStyle}
                     onLoad={imageLoaded}
                 />
             </div>
