@@ -66,7 +66,12 @@ const App = () => {
         const destinationIndex = result.destination?.index;
         if (sourceIndex === undefined || destinationIndex === undefined) return;
         const cardMoved = cardsClone.splice(sourceIndex, 1);
-        cardsClone.splice(destinationIndex, 0, ...cardMoved);
+        cardsClone.splice(
+            destinationIndex -
+                (sourceIndex < 3 && destinationIndex > 2 ? 1 : 0),
+            0,
+            ...cardMoved
+        );
         cardsClone.map((card, index) => (card.position = index));
         updateCards(sortCard(cardsClone));
     };
