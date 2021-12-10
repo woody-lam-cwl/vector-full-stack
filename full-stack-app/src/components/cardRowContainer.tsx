@@ -22,9 +22,8 @@ const CardRowContainer = (props: CardRowContainerProps) => {
                     {props.cards.map((card) => (
                         <Card
                             key={card.type}
-                            type={card.type}
-                            title={card.title}
-                            position={card.position}
+                            data={card}
+                            overlayCallback={() => props.overlayCallback(card)}
                         />
                     ))}
                     {provided.placeholder}

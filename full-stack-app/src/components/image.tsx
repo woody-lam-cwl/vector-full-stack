@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import Loader from 'react-loader-spinner';
 import ImageProps from '../interfaces/imageProps';
 
-const spinnerDivStyle: React.CSSProperties = {
+const divStyle: React.CSSProperties = {
     height: '80%',
+    width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
 };
@@ -28,7 +29,7 @@ const Image = (props: ImageProps) => {
             <div
                 style={{
                     display: loading ? 'flex' : 'none',
-                    ...spinnerDivStyle,
+                    ...divStyle,
                 }}
             >
                 <Loader
@@ -38,7 +39,12 @@ const Image = (props: ImageProps) => {
                     width="8vw"
                 ></Loader>
             </div>
-            <div style={{ display: loading ? 'none' : 'block' }}>
+            <div
+                style={{
+                    display: loading ? 'none' : 'flex',
+                    ...divStyle,
+                }}
+            >
                 <img
                     src={'/images/' + props.type + '.gif'}
                     alt={props.type}

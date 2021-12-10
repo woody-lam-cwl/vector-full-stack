@@ -14,6 +14,6 @@ Part I
 
 [v] Reorder cards by drag and drop
 
-[ ] Create overlay feature
+[v] Create overlay feature
 
 [ ] Write README file

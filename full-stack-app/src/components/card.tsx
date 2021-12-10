@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Draggable } from 'react-beautiful-dnd';
+import { DragDisabledContext } from '../app';
 import CardProps from '../interfaces/cardProps';
 import Image from './image';
 
@@ -22,8 +23,13 @@ const cardTitleStyle: React.CSSProperties = {
 };
 
 const Card = (props: CardProps) => {
+    const isDragDisabled = useContext(DragDisabledContext);
     return (
-        <Draggable index={props.position} draggableId={props.type}>
+        <Draggable
+            index={props.data.position}
+            draggableId={props.data.type}
+            isDragDisabled={isDragDisabled}
+        >
             {(provided, snapshot) => {
                 const dynamicCardStyle: React.CSSProperties = {
                     ...cardStyle,
@@ -36,12 +42,10 @@ const Card = (props: CardProps) => {
                         {...provided.dragHandleProps}
                         {...provided.draggableProps}
                         style={dynamicCardStyle}
+                        onClick={props.overlayCallback}
                     >
-                        <h1 style={cardTitleStyle}>{props.title}</h1>
-                        <Image
-                            src={'/images/' + props.type + '.gif'}
-                            type={props.type}
-                        />
+                        <h1 style={cardTitleStyle}>{props.data.title}</h1>
+                        <Image type={props.data.type} />
                     </div>
                 );
             }}
