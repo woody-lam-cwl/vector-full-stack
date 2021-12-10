@@ -12,7 +12,7 @@ Part I
 
 [v] Display placeholder spinner for loading image
 
-[ ] Reorder cards by drag and drop
+[v] Reorder cards by drag and drop
 
 [ ] Create overlay feature
 
