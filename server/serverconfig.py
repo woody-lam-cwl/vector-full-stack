@@ -1,0 +1,5 @@
+DB_HOST = "localhost"
+DB_NAME = "vector-full-stack"
+DB_USER = ""
+DB_PASS = ""
+TABLE_NAME = "card"
