@@ -15,20 +15,14 @@ async def withSQLServer(callback, *args):
             return result
 
 
-async def checkCardExists(cur, cardShouldExist, type, title, position):
-    cur.execute(f"SELECT type, title, position FROM {TABLE_NAME} WHERE type = '{type}'")
-    card = cur.fetchone()
+async def checkCardExists(cur, cardShouldExist, type):
+    card = await getOneCard(cur, type)
     if card != None and not cardShouldExist:
         raise RuntimeError("Card type exists")
     if cardShouldExist:
         if card == None:
             raise RuntimeError("Card not found")
-        elif (
-            card["type"] != type
-            or card["title"] != title
-            or card["position"] != position
-        ):
-            raise RuntimeError("Mismatch card data")
+    return card
 
 
 async def loadDefaultCards(cur):
@@ -46,24 +40,25 @@ async def loadDefaultCards(cur):
 
 async def getAllCards(cur):
     cur.execute(f"SELECT type, title, position FROM {TABLE_NAME} ORDER BY position ASC")
-    cards = [dict(card) for card in cur.fetchall()]
-    return cards
+    return [dict(card) for card in cur.fetchall()]
+
+
+async def getOneCard(cur, type):
+    cur.execute(f"SELECT type, title, position FROM {TABLE_NAME} WHERE type = '{type}'")
+    card = cur.fetchone()
+    return dict(card) if card else None
 
 
 async def addCard(cur, type, title, position):
-    await checkCardExists(cur, False, type, title, position)
+    await checkCardExists(cur, False, type)
     cur.execute(
         f"INSERT INTO {TABLE_NAME} (type, title, position) VALUES ('{type}', '{title}', {position})"
     )
     return {"type": type, "title": title, "position": position}
 
 
-async def updateCard(
-    cur, type, originalTitle, originalPosition, newTitle=None, newPosition=None
-):
-    await checkCardExists(cur, True, type, originalTitle, originalPosition)
-    title = originalTitle if newTitle == None else newTitle
-    position = originalPosition if newPosition == None else newPosition
+async def updateCard(cur, type, title, position):
+    await checkCardExists(cur, True, type)
     cur.execute(
         f"UPDATE {TABLE_NAME} SET title = '{title}', position = {position} WHERE type = '{type}'"
     )
@@ -75,38 +70,37 @@ async def updateCard(
 
 
 async def deleteCard(cur, type, title, position):
-    await checkCardExists(cur, True, type, title, position)
+    card = await checkCardExists(cur, True, type)
     cur.execute(f"DELETE FROM {TABLE_NAME} WHERE type = '{type}'")
-    return {"type": type, "title": title, "position": position}
+    return dict(card)
 
 
 # Public functions for API uses
-async def asyncLoadDefaultCards(requestBody=None):
-    return await withSQLServer(loadDefaultCards)
-
-
-async def asyncGetAllCards(requestBody=None):
+async def asyncGetAllCards(type=None, requestBody=None):
     return await withSQLServer(getAllCards)
 
 
-async def asyncAddCard(requestBody):
+async def asyncLoadDefaultCards(type=None, requestBody=None):
+    return await withSQLServer(loadDefaultCards)
+
+
+async def asyncGetOneCard(type, requestBody=None):
+    return await withSQLServer(getOneCard, type)
+
+
+async def asyncAddCard(type, requestBody):
     return await withSQLServer(
-        addCard, requestBody["type"], requestBody["title"], requestBody["position"]
+        addCard, type, requestBody["title"], requestBody["position"]
     )
 
 
-async def asyncUpdateCard(requestBody):
+async def asyncUpdateCard(type, requestBody):
     return await withSQLServer(
-        updateCard,
-        requestBody["type"],
-        requestBody["title"],
-        requestBody["position"],
-        requestBody.get("newTitle", None),
-        requestBody.get("newPosition", None),
+        updateCard, type, requestBody["title"], requestBody["position"]
     )
 
 
-async def asyncDeleteCard(requestBody):
+async def asyncDeleteCard(type, requestBody):
     return await withSQLServer(
-        deleteCard, requestBody["type"], requestBody["title"], requestBody["position"]
+        deleteCard, type, requestBody["title"], requestBody["position"]
     )
