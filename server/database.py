@@ -69,7 +69,7 @@ async def updateCard(cur, type, title, position):
     }
 
 
-async def deleteCard(cur, type, title, position):
+async def deleteCard(cur, type):
     card = await checkCardExists(cur, True, type)
     cur.execute(f"DELETE FROM {TABLE_NAME} WHERE type = '{type}'")
     return dict(card)
@@ -100,7 +100,5 @@ async def asyncUpdateCard(type, requestBody):
     )
 
 
-async def asyncDeleteCard(type, requestBody):
-    return await withSQLServer(
-        deleteCard, type, requestBody["title"], requestBody["position"]
-    )
+async def asyncDeleteCard(type, requestBody=None):
+    return await withSQLServer(deleteCard, type)
