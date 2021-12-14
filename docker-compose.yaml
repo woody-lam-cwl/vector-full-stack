@@ -5,10 +5,8 @@ services:
     image: postgres:latest
     container_name: database
     restart: always
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: vector-full-stack
+    env_file:
+      - postgres.env
     volumes:
       - db-data:/var/lib/postgresql/data/
     ports:

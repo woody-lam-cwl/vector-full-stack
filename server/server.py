@@ -76,11 +76,9 @@ middleware = [
 app = Starlette(routes=routes, middleware=middleware)
 
 if __name__ == "__main__":
+    # Reset database on boot for development use
     try:
         asyncio.run(asyncResetDefaultCards())
     except:
-        try:
-            asyncio.run(asyncLoadDefaultCards())
-        except:
-            pass
+        asyncio.run(asyncLoadDefaultCards())
     uvicorn.run(app, host="0.0.0.0", port=8000)
