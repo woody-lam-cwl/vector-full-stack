@@ -1,9 +1,25 @@
-import React, { createContext, useEffect, useState } from 'react';
+import React, { createContext, useEffect, useRef, useState } from 'react';
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
+import _ from 'lodash';
 import CardRowContainer from './components/cardRowContainer';
 import Image from './components/image';
+import {
+    getCardsFromServer,
+    updateAllCardsToServer,
+} from './httpRequest';
 import CardData from './interfaces/cardData';
-import data from './res/data.json';
+
+const headerBarStyle: React.CSSProperties = {
+    display: 'flex',
+    alignItems: 'center',
+    fontFamily: 'monospace',
+};
+
+
+const lastUpdateStyle: React.CSSProperties = {
+    margin: '1rem',
+    fontSize: '1.4rem',
+};
 
 const cardRowsStyle: React.CSSProperties = {
     display: 'flex',
@@ -49,12 +65,46 @@ const cardsInRows = (cards: CardData[]) => {
 export const DragDisabledContext = createContext(false);
 
 const App = () => {
-    const [cards, updateCards] = useState(sortCard(data));
+    const lastSavedCards = useRef<CardData[]>([]);
+    const [secondsSinceLastSave, setSecondsSinceLastSave] = useState(0);
+    const [cards, setCards] = useState<CardData[]>([]);
     const [isOverlayActive, setOverlayActive] = useState(false);
     const [overlayData, updateOverlayData] = useState<CardData>();
+    const updateCards = (cards: CardData[]) => setCards(sortCard(cards));
+
+    const countUpSeconds = () => {
+        if (areCardsSaved()) return;
+        setTimeout(
+            () => setSecondsSinceLastSave(secondsSinceLastSave + 1),
+            1000
+        );
+    };
+
+    const areCardsSaved = () => {
+        if (secondsSinceLastSave % 5 === 0 && secondsSinceLastSave > 0) {
+            const cardsChanged = cards.filter(
+                (value, index) =>
+                    !_.isEqual(value, lastSavedCards.current[index])
+            );
+            if (cardsChanged.length > 0) {
+                updateAllCardsToServer(cardsChanged);
+                lastSavedCards.current = JSON.parse(JSON.stringify(cards));
+                setSecondsSinceLastSave(0);
+                return true;
+            }
+        }
+        return false;
+    };
+
+    // eslint-disable-next-line
+    useEffect(countUpSeconds, [secondsSinceLastSave]);
 
     useEffect(() => {
         window.addEventListener('keydown', keyDown);
+        getCardsFromServer((cards) => {
+            updateCards(cards);
+            lastSavedCards.current = JSON.parse(JSON.stringify(cards));
+        });
         return () => {
             window.removeEventListener('keydown', keyDown);
         };
@@ -78,7 +128,6 @@ const App = () => {
 
     const keyDown = (event: KeyboardEvent) => {
         if (event.key === 'Escape') setOverlayActive(false);
-        console.log(event.key);
     };
 
     const activateOverlay = (card: CardData) => {
@@ -89,6 +138,11 @@ const App = () => {
     return (
         <DragDisabledContext.Provider value={isOverlayActive}>
             <React.Fragment>
+                <div style={headerBarStyle}>
+                    <h1 style={lastUpdateStyle}>
+                        Last updated: {secondsSinceLastSave} seconds ago
+                    </h1>
+                </div>
                 <DragDropContext onDragEnd={dragEnd}>
                     <div style={cardRowsStyle}>
                         {cardsInRows(cards).map((cards, index) => (
