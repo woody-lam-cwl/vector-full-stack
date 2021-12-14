@@ -37,7 +37,7 @@ class batch(HTTPEndpoint):
     async def put(self, request):
         body = await request.json()
         for card in body:
-            await errorWrapper(asyncUpdateCard, True, card["type"], body)
+            await errorWrapper(asyncUpdateCard, True, card["type"], card)
         return await errorWrapper(asyncGetAllCards)
 
 

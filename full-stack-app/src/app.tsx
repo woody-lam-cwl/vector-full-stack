@@ -8,6 +8,7 @@ import {
     updateAllCardsToServer,
 } from './httpRequest';
 import CardData from './interfaces/cardData';
+import Loader from 'react-loader-spinner';
 
 const headerBarStyle: React.CSSProperties = {
     display: 'flex',
@@ -67,6 +68,7 @@ export const DragDisabledContext = createContext(false);
 const App = () => {
     const lastSavedCards = useRef<CardData[]>([]);
     const [secondsSinceLastSave, setSecondsSinceLastSave] = useState(0);
+    const [areCardsSaving, setSavingState] = useState(false);
     const [cards, setCards] = useState<CardData[]>([]);
     const [isOverlayActive, setOverlayActive] = useState(false);
     const [overlayData, updateOverlayData] = useState<CardData>();
@@ -87,7 +89,11 @@ const App = () => {
                     !_.isEqual(value, lastSavedCards.current[index])
             );
             if (cardsChanged.length > 0) {
-                updateAllCardsToServer(cardsChanged);
+                setSavingState(true);
+                console.log(cardsChanged);
+                updateAllCardsToServer(cardsChanged, () =>
+                    setSavingState(false)
+                );
                 lastSavedCards.current = JSON.parse(JSON.stringify(cards));
                 setSecondsSinceLastSave(0);
                 return true;
@@ -142,6 +148,14 @@ const App = () => {
                     <h1 style={lastUpdateStyle}>
                         Last updated: {secondsSinceLastSave} seconds ago
                     </h1>
+                    <div style={{ display: areCardsSaving ? 'flex' : 'none' }}>
+                        <Loader
+                            type="TailSpin"
+                            color="#BFBFBF"
+                            height="4vw"
+                            width="4vw"
+                        />
+                    </div>
                 </div>
                 <DragDropContext onDragEnd={dragEnd}>
                     <div style={cardRowsStyle}>

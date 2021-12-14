@@ -22,10 +22,13 @@ const resetCardsToDefault = () => {
         .catch((error) => errorHandling(error));
 };
 
-const updateAllCardsToServer = (cards: CardData[]) => {
+const updateAllCardsToServer = (cards: CardData[], callback: () => void) => {
     server
         .put('', cards)
-        .then((response) => console.log(response.data))
+        .then((response) => {
+            console.log(response.data);
+            setTimeout(callback, 500); //Delay added to demonstrate loading spinner only
+        })
         .catch((error) => errorHandling(error));
 };
 
