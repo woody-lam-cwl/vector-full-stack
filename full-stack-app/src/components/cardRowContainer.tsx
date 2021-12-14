@@ -3,21 +3,17 @@ import { Droppable } from 'react-beautiful-dnd';
 import CardRowContainerProps from '../interfaces/cardRowContainerProps';
 import Card from './card';
 
-const containerStyle: React.CSSProperties = {
-    display: 'flex',
-};
-
 const CardRowContainer = (props: CardRowContainerProps) => {
     return (
         <Droppable
             droppableId={'cardRow-' + props.rowIndex}
             direction="horizontal"
         >
-            {(provided, snapshot) => (
+            {(provided) => (
                 <div
+                    className="d-flex"
                     ref={provided.innerRef}
                     {...provided.droppableProps}
-                    style={containerStyle}
                 >
                     {props.cards.map((card) => (
                         <Card

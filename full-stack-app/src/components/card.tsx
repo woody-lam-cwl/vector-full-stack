@@ -5,21 +5,14 @@ import CardProps from '../interfaces/cardProps';
 import Image from './image';
 
 const cardStyle: React.CSSProperties = {
-    width: '20vw',
+    width: '25vw',
     height: 'auto',
     backgroundColor: '#CCCCCC',
-    margin: '0.8vw',
-    padding: '0.8vw',
+    margin: '1vw',
+    padding: '1.5vw 0.5vw',
     textAlign: 'center',
     border: '0.3em solid #0000FF',
     borderRadius: '1em',
-};
-
-const cardTitleStyle: React.CSSProperties = {
-    fontSize: '1.5em',
-    fontWeight: 'normal',
-    fontFamily: 'monospace',
-    margin: '0.3em 0',
 };
 
 const Card = (props: CardProps) => {
@@ -30,7 +23,7 @@ const Card = (props: CardProps) => {
             draggableId={props.data.type}
             isDragDisabled={isDragDisabled}
         >
-            {(provided, snapshot) => {
+            {(provided) => {
                 const dynamicCardStyle: React.CSSProperties = {
                     ...cardStyle,
                     ...provided.draggableProps.style,
@@ -44,7 +37,7 @@ const Card = (props: CardProps) => {
                         style={dynamicCardStyle}
                         onClick={props.overlayCallback}
                     >
-                        <h1 style={cardTitleStyle}>{props.data.title}</h1>
+                        <p className="fs-3 mt-0 mb-1">{props.data.title}</p>
                         <Image type={props.data.type} />
                     </div>
                 );

@@ -55,10 +55,13 @@ const updateCardToServer = (card: CardData) => {
         .catch((error) => console.log(error));
 };
 
-const deleteCardFromServer = (card: CardData) => {
+const deleteCardFromServer = (card: CardData, callback: () => void) => {
     server
         .delete(`/${card.type}`)
-        .then((response) => console.log(response.data))
+        .then((response) => {
+            callback();
+            console.log(response.data);
+        })
         .catch((error) => console.log(error));
 };
 

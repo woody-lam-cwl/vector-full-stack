@@ -1,108 +1,36 @@
 import React, { createContext, useEffect, useRef, useState } from 'react';
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
 import _ from 'lodash';
-import CardRowContainer from './components/cardRowContainer';
-import Image from './components/image';
 import {
+    deleteCardFromServer,
     getCardsFromServer,
     resetCardsToDefault,
     updateAllCardsToServer,
 } from './httpRequest';
+import CardRowContainer from './components/cardRowContainer';
 import CardData from './interfaces/cardData';
-import Loader from 'react-loader-spinner';
-
-const headerBarStyle: React.CSSProperties = {
-    display: 'flex',
-    alignItems: 'center',
-    fontFamily: 'monospace',
-};
-
-const buttonStyle: React.CSSProperties = {
-    margin: '0.5rem',
-    padding: '0.4rem 0.8rem',
-    fontSize: '1.2rem',
-    fontWeight: 'bold',
-    fontFamily: 'monospace',
-    color: '#FFFF00',
-    backgroundColor: '#00AAEE',
-    border: '0.2rem solid #0000EE',
-    borderRadius: '0.5rem',
-};
-
-const lastUpdateStyle: React.CSSProperties = {
-    margin: '1rem',
-    fontSize: '1.4rem',
-};
-
-const cardRowsStyle: React.CSSProperties = {
-    display: 'flex',
-    flexDirection: 'column',
-};
-
-const overlayStyle: React.CSSProperties = {
-    position: 'absolute',
-    top: '0',
-    left: '0',
-    width: '100%',
-    height: '100%',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#55555599',
-    background: '0.7',
-};
-
-const overlayContainerStyle: React.CSSProperties = {
-    display: 'flex',
-    flexDirection: 'column',
-    backgroundColor: '#CCCCCC',
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '30em',
-    height: '30em',
-    padding: '1.2rem 0.4rem 0.2rem',
-    border: '0.8em solid #222222',
-    borderRadius: '2em',
-};
-
-const timeSince = (seconds: number) => {
-    if (seconds >= 3600) {
-        const hours = Math.floor(seconds / 3600);
-        return `${hours} hour${hours === 1 ? '' : 's'}`;
-    } else if (seconds >= 60) {
-        const minutes = Math.floor(seconds / 60);
-        return `${minutes} minute${minutes === 1 ? '' : 's'}`;
-    }
-    return `${seconds} second${seconds === 1 ? '' : 's'}`;
-};
-
-const sortCard = (cards: CardData[]) =>
-    cards.sort((x, y) => (x.position > y.position ? 1 : -1));
-
-const numberOfRows = (length: number) => ((length + 2) / 3) >> 0;
-
-const cardsInRows = (cards: CardData[]) => {
-    var rows: CardData[][] = [];
-    for (var i = 0; i < numberOfRows(cards.length); i++) {
-        rows.push(cards.slice(3 * i, 3 * (i + 1)));
-    }
-    return rows;
-};
+import { cardsInRows, reorderCards, sortCard } from './appDisplayLogic';
+import Header from './components/header';
+import Overlay from './components/overlay';
 
 export const DragDisabledContext = createContext(false);
 
 const App = () => {
     const lastSavedCards = useRef<CardData[]>([]);
+    const saveCycleInterrupted = useRef(false);
     const [secondsSinceLastSave, setSecondsSinceLastSave] = useState(0);
     const [areCardsSaving, setSavingState] = useState(false);
     const [cards, setCards] = useState<CardData[]>([]);
     const [isOverlayActive, setOverlayActive] = useState(false);
     const [overlayData, updateOverlayData] = useState<CardData>();
+
     const updateCards = (cards: CardData[]) => setCards(sortCard(cards));
     const updateLastSavedCards = (cards: CardData[]) =>
         (lastSavedCards.current = JSON.parse(JSON.stringify(cards)));
     const updateDisplayAndCachedCards = (cards: CardData[]) => {
         updateCards(cards);
         updateLastSavedCards(cards);
+        saveCycleInterrupted.current = true;
     };
 
     const countUpSeconds = () => {
@@ -114,6 +42,11 @@ const App = () => {
     };
 
     const areCardsSaved = () => {
+        if (saveCycleInterrupted.current) {
+            setSecondsSinceLastSave(0);
+            saveCycleInterrupted.current = false;
+            return true;
+        }
         if (secondsSinceLastSave % 5 === 0 && secondsSinceLastSave > 0) {
             const cardsChanged = cards.filter(
                 (value, index) =>
@@ -121,7 +54,6 @@ const App = () => {
             );
             if (cardsChanged.length > 0) {
                 setSavingState(true);
-                console.log(cardsChanged);
                 updateAllCardsToServer(cardsChanged, () =>
                     setSavingState(false)
                 );
@@ -146,19 +78,13 @@ const App = () => {
     }, []);
 
     const dragEnd = (result: DropResult) => {
-        var cardsClone = [...cards];
-        const sourceIndex = result.source?.index;
-        const destinationIndex = result.destination?.index;
-        if (sourceIndex === undefined || destinationIndex === undefined) return;
-        const cardMoved = cardsClone.splice(sourceIndex, 1);
-        cardsClone.splice(
-            destinationIndex -
-                (sourceIndex < 3 && destinationIndex > 2 ? 1 : 0),
-            0,
-            ...cardMoved
+        const updatedCards = reorderCards(
+            [...cards],
+            result.destination?.index,
+            result.source?.index
         );
-        cardsClone.map((card, index) => (card.position = index));
-        updateCards(sortCard(cardsClone));
+        if (updatedCards === null) return;
+        updateCards(updatedCards);
     };
 
     const keyDown = (event: KeyboardEvent) => {
@@ -171,28 +97,25 @@ const App = () => {
     };
 
     const resetCards = () => resetCardsToDefault(updateDisplayAndCachedCards);
+    const deleteCard = (card: CardData | undefined) => {
+        if (card !== undefined) {
+            setOverlayActive(false);
+            deleteCardFromServer(card, () =>
+                getCardsFromServer(updateDisplayAndCachedCards)
+            );
+        }
+    };
 
     return (
         <DragDisabledContext.Provider value={isOverlayActive}>
             <React.Fragment>
-                <div style={headerBarStyle}>
-                    <button style={buttonStyle} onClick={resetCards}>
-                        Reset to Default
-                    </button>
-                    <h1 style={lastUpdateStyle}>
-                        Last updated: {timeSince(secondsSinceLastSave)} ago
-                    </h1>
-                    <div style={{ display: areCardsSaving ? 'flex' : 'none' }}>
-                        <Loader
-                            type="TailSpin"
-                            color="#BFBFBF"
-                            height="4vw"
-                            width="4vw"
-                        />
-                    </div>
-                </div>
+                <Header
+                    resetCardsCallback={resetCards}
+                    secondsSinceLastSave={secondsSinceLastSave}
+                    areCardsSaving={areCardsSaving}
+                ></Header>
                 <DragDropContext onDragEnd={dragEnd}>
-                    <div style={cardRowsStyle}>
+                    <div className="d-flex flex-column px-5">
                         {cardsInRows(cards).map((cards, index) => (
                             <CardRowContainer
                                 key={index}
@@ -203,17 +126,11 @@ const App = () => {
                         ))}
                     </div>
                 </DragDropContext>
-
-                <div
-                    style={{
-                        display: isOverlayActive ? 'flex' : 'none',
-                        ...overlayStyle,
-                    }}
-                >
-                    <div style={overlayContainerStyle}>
-                        <Image type={overlayData?.type || ''} />
-                    </div>
-                </div>
+                <Overlay
+                    isOverlayActive={isOverlayActive}
+                    overlayData={overlayData}
+                    deleteCardCallback={deleteCard}
+                />
             </React.Fragment>
         </DragDisabledContext.Provider>
     );
