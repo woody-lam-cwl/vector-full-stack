@@ -76,5 +76,11 @@ middleware = [
 app = Starlette(routes=routes, middleware=middleware)
 
 if __name__ == "__main__":
-    asyncio.run(asyncLoadDefaultCards())
+    try:
+        asyncio.run(asyncResetDefaultCards())
+    except:
+        try:
+            asyncio.run(asyncLoadDefaultCards())
+        except:
+            pass
     uvicorn.run(app, host="0.0.0.0", port=8000)

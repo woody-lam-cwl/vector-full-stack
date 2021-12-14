@@ -3,22 +3,24 @@ import CardData from './interfaces/cardData';
 
 const server = axios.create({ baseURL: 'http://localhost:8000' });
 
+const responseHandling = (
+    response: any,
+    updateCards: (cards: CardData[]) => void
+) => updateCards(response.data as CardData[]);
+
 const errorHandling = (error: any) => console.log(error);
 
 const getCardsFromServer = (updateCards: (cards: CardData[]) => void) => {
     server
         .get('')
-        .then((response) => {
-            const cards = response.data as CardData[];
-            updateCards(cards);
-        })
+        .then((response) => responseHandling(response, updateCards))
         .catch((error) => errorHandling(error));
 };
 
-const resetCardsToDefault = () => {
+const resetCardsToDefault = (updateCards: (cards: CardData[]) => void) => {
     server
         .post('')
-        .then((response) => console.log(response.data))
+        .then((response) => responseHandling(response, updateCards))
         .catch((error) => errorHandling(error));
 };
 

@@ -98,6 +98,12 @@ const App = () => {
     const [isOverlayActive, setOverlayActive] = useState(false);
     const [overlayData, updateOverlayData] = useState<CardData>();
     const updateCards = (cards: CardData[]) => setCards(sortCard(cards));
+    const updateLastSavedCards = (cards: CardData[]) =>
+        (lastSavedCards.current = JSON.parse(JSON.stringify(cards)));
+    const updateDisplayAndCachedCards = (cards: CardData[]) => {
+        updateCards(cards);
+        updateLastSavedCards(cards);
+    };
 
     const countUpSeconds = () => {
         if (areCardsSaved()) return;
@@ -119,7 +125,7 @@ const App = () => {
                 updateAllCardsToServer(cardsChanged, () =>
                     setSavingState(false)
                 );
-                lastSavedCards.current = JSON.parse(JSON.stringify(cards));
+                updateLastSavedCards(cards);
                 setSecondsSinceLastSave(0);
                 return true;
             }
@@ -132,13 +138,11 @@ const App = () => {
 
     useEffect(() => {
         window.addEventListener('keydown', keyDown);
-        getCardsFromServer((cards) => {
-            updateCards(cards);
-            lastSavedCards.current = JSON.parse(JSON.stringify(cards));
-        });
+        getCardsFromServer(updateDisplayAndCachedCards);
         return () => {
             window.removeEventListener('keydown', keyDown);
         };
+        // eslint-disable-next-line
     }, []);
 
     const dragEnd = (result: DropResult) => {
@@ -166,10 +170,7 @@ const App = () => {
         setOverlayActive(true);
     };
 
-    const resetCards = () => {
-        resetCardsToDefault();
-        getCardsFromServer(updateCards);
-    };
+    const resetCards = () => resetCardsToDefault(updateDisplayAndCachedCards);
 
     return (
         <DragDisabledContext.Provider value={isOverlayActive}>
