@@ -5,7 +5,9 @@ import CardRowContainer from './components/cardRowContainer';
 import Image from './components/image';
 import {
     getCardsFromServer,
+    resetCardsToDefault,
     updateAllCardsToServer,
+    deleteCardFromServer,
 } from './httpRequest';
 import CardData from './interfaces/cardData';
 import Loader from 'react-loader-spinner';
@@ -16,6 +18,17 @@ const headerBarStyle: React.CSSProperties = {
     fontFamily: 'monospace',
 };
 
+const buttonStyle: React.CSSProperties = {
+    margin: '0.5rem',
+    padding: '0.4rem 0.8rem',
+    fontSize: '1.2rem',
+    fontWeight: 'bold',
+    fontFamily: 'monospace',
+    color: '#FFFF00',
+    backgroundColor: '#00AAEE',
+    border: '0.2rem solid #0000EE',
+    borderRadius: '0.5rem',
+};
 
 const lastUpdateStyle: React.CSSProperties = {
     margin: '1rem',
@@ -41,11 +54,13 @@ const overlayStyle: React.CSSProperties = {
 
 const overlayContainerStyle: React.CSSProperties = {
     display: 'flex',
+    flexDirection: 'column',
     backgroundColor: '#CCCCCC',
     alignItems: 'center',
     justifyContent: 'center',
     width: '30em',
     height: '30em',
+    padding: '1.2rem 0.4rem 0.2rem',
     border: '0.8em solid #222222',
     borderRadius: '2em',
 };
@@ -141,10 +156,26 @@ const App = () => {
         setOverlayActive(true);
     };
 
+    const resetCards = () => {
+        resetCardsToDefault();
+        getCardsFromServer(updateCards);
+    };
+
+    const deleteCard = () => {
+        if (overlayData !== undefined) {
+            deleteCardFromServer(overlayData);
+            getCardsFromServer(updateCards);
+            setOverlayActive(false);
+        }
+    };
+
     return (
         <DragDisabledContext.Provider value={isOverlayActive}>
             <React.Fragment>
                 <div style={headerBarStyle}>
+                    <button style={buttonStyle} onClick={resetCards}>
+                        Reset to Default
+                    </button>
                     <h1 style={lastUpdateStyle}>
                         Last updated: {secondsSinceLastSave} seconds ago
                     </h1>
@@ -178,6 +209,9 @@ const App = () => {
                 >
                     <div style={overlayContainerStyle}>
                         <Image type={overlayData?.type || ''} />
+                        <button style={buttonStyle} onClick={deleteCard}>
+                            Remove Card
+                        </button>
                     </div>
                 </div>
             </React.Fragment>
