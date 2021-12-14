@@ -1,5 +1,5 @@
-DB_HOST = "localhost"
+DB_HOST = "database"
 DB_NAME = "vector-full-stack"
-DB_USER = ""
-DB_PASS = ""
+DB_USER = "postgres"
+DB_PASS = "postgres"
 TABLE_NAME = "card"

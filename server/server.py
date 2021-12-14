@@ -1,3 +1,4 @@
+import asyncio
 from starlette.applications import Starlette
 from starlette.routing import Route
 from starlette.middleware import Middleware
@@ -32,7 +33,7 @@ class batch(HTTPEndpoint):
         return await errorWrapper(asyncGetAllCards)
 
     async def post(self, request):
-        return await errorWrapper(asyncLoadDefaultCards)
+        return await errorWrapper(asyncResetDefaultCards)
 
     async def put(self, request):
         body = await request.json()

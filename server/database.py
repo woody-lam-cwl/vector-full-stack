@@ -1,5 +1,3 @@
-import asyncio
-from typing import AsyncIterator
 import psycopg2
 import psycopg2.extras
 from serverconfig import *
@@ -26,7 +24,6 @@ async def checkCardExists(cur, cardShouldExist, type):
 
 
 async def loadDefaultCards(cur):
-    cur.execute(f"DROP TABLE {TABLE_NAME}")
     cur.execute(
         f"CREATE TABLE {TABLE_NAME} (type varchar(255) PRIMARY KEY, title varchar(255), position integer)"
     )
@@ -36,6 +33,11 @@ async def loadDefaultCards(cur):
     await addCard(cur, "bank-draft-2", "Bank Draft 2", 3)
     await addCard(cur, "bill-of-lading-2", "Bill of Lading 2", 4)
     return await getAllCards(cur)
+
+
+async def resetDefaultCards(cur):
+    cur.execute(f"DROP TABLE {TABLE_NAME}")
+    return await loadDefaultCards(cur)
 
 
 async def getAllCards(cur):
@@ -82,6 +84,10 @@ async def asyncGetAllCards(type=None, requestBody=None):
 
 async def asyncLoadDefaultCards(type=None, requestBody=None):
     return await withSQLServer(loadDefaultCards)
+
+
+async def asyncResetDefaultCards(type=None, requestBody=None):
+    return await withSQLServer(resetDefaultCards)
 
 
 async def asyncGetOneCard(type, requestBody=None):

@@ -7,7 +7,6 @@ import {
     getCardsFromServer,
     resetCardsToDefault,
     updateAllCardsToServer,
-    deleteCardFromServer,
 } from './httpRequest';
 import CardData from './interfaces/cardData';
 import Loader from 'react-loader-spinner';
@@ -63,6 +62,17 @@ const overlayContainerStyle: React.CSSProperties = {
     padding: '1.2rem 0.4rem 0.2rem',
     border: '0.8em solid #222222',
     borderRadius: '2em',
+};
+
+const timeSince = (seconds: number) => {
+    if (seconds >= 3600) {
+        const hours = Math.floor(seconds / 3600);
+        return `${hours} hour${hours === 1 ? '' : 's'}`;
+    } else if (seconds >= 60) {
+        const minutes = Math.floor(seconds / 60);
+        return `${minutes} minute${minutes === 1 ? '' : 's'}`;
+    }
+    return `${seconds} second${seconds === 1 ? '' : 's'}`;
 };
 
 const sortCard = (cards: CardData[]) =>
@@ -161,14 +171,6 @@ const App = () => {
         getCardsFromServer(updateCards);
     };
 
-    const deleteCard = () => {
-        if (overlayData !== undefined) {
-            deleteCardFromServer(overlayData);
-            getCardsFromServer(updateCards);
-            setOverlayActive(false);
-        }
-    };
-
     return (
         <DragDisabledContext.Provider value={isOverlayActive}>
             <React.Fragment>
@@ -177,7 +179,7 @@ const App = () => {
                         Reset to Default
                     </button>
                     <h1 style={lastUpdateStyle}>
-                        Last updated: {secondsSinceLastSave} seconds ago
+                        Last updated: {timeSince(secondsSinceLastSave)} ago
                     </h1>
                     <div style={{ display: areCardsSaving ? 'flex' : 'none' }}>
                         <Loader
@@ -209,9 +211,6 @@ const App = () => {
                 >
                     <div style={overlayContainerStyle}>
                         <Image type={overlayData?.type || ''} />
-                        <button style={buttonStyle} onClick={deleteCard}>
-                            Remove Card
-                        </button>
                     </div>
                 </div>
             </React.Fragment>
