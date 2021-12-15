@@ -44,7 +44,6 @@ class batch(HTTPEndpoint):
 
 class individual(HTTPEndpoint):
     async def get(self, request):
-        print(request.path_params["type"])
         return await errorWrapper(asyncGetOneCard, cardType=request.path_params["type"])
 
     async def post(self, request):
