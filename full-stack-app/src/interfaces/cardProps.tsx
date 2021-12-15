@@ -1,8 +1,7 @@
-import CardData from './cardData';
-
 interface CardProps {
-    data: CardData;
-    overlayCallback: () => void;
+    type: string;
+    title: string;
+    position: number;
 }
 
 export default CardProps;

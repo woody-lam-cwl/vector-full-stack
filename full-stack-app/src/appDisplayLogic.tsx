@@ -1,4 +1,4 @@
-import CardData from './interfaces/cardData';
+import CardProps from './interfaces/cardProps';
 
 const timeSince = (seconds: number) => {
     if (seconds >= 3600) {
@@ -11,13 +11,13 @@ const timeSince = (seconds: number) => {
     return `${seconds} second${seconds === 1 ? '' : 's'}`;
 };
 
-const sortCard = (cards: CardData[]) =>
+const sortCard = (cards: CardProps[]) =>
     cards.sort((x, y) => (x.position > y.position ? 1 : -1));
 
 const numberOfRows = (length: number) => ((length + 2) / 3) >> 0;
 
-const cardsInRows = (cards: CardData[]) => {
-    var rows: CardData[][] = [];
+const cardsInRows = (cards: CardProps[]) => {
+    var rows: CardProps[][] = [];
     for (var i = 0; i < numberOfRows(cards.length); i++) {
         rows.push(cards.slice(3 * i, 3 * (i + 1)));
     }
@@ -25,9 +25,9 @@ const cardsInRows = (cards: CardData[]) => {
 };
 
 const reorderCards = (
-    cards: CardData[],
-    destinationIndex: number | null | undefined,
-    sourceIndex: number | null | undefined
+    cards: CardProps[],
+    destinationIndex: number | undefined,
+    sourceIndex: number | undefined
 ) => {
     if (typeof sourceIndex !== 'number' || typeof destinationIndex !== 'number')
         return null;

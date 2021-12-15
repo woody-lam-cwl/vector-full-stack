@@ -1,9 +1,9 @@
-import CardData from './cardData';
+import CardProps from './cardProps';
 
 interface OverlayProps {
     isOverlayActive: boolean;
-    overlayData: CardData | undefined;
-    deleteCardCallback: (card: CardData | undefined) => void;
+    overlayData: CardProps | undefined;
+    deleteCardCallback: (card: CardProps | undefined) => void;
 }
 
 export default OverlayProps;

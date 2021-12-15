@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { Draggable } from 'react-beautiful-dnd';
-import { DragDisabledContext } from '../app';
+import { DragDisabledContext, OverlayCallbackContext } from '../app';
 import CardProps from '../interfaces/cardProps';
 import Image from './image';
 
@@ -17,10 +17,11 @@ const cardStyle: React.CSSProperties = {
 
 const Card = (props: CardProps) => {
     const isDragDisabled = useContext(DragDisabledContext);
+    const overlayCallback = useContext(OverlayCallbackContext);
     return (
         <Draggable
-            index={props.data.position}
-            draggableId={props.data.type}
+            index={props.position}
+            draggableId={props.type}
             isDragDisabled={isDragDisabled}
         >
             {(provided) => {
@@ -35,10 +36,10 @@ const Card = (props: CardProps) => {
                         {...provided.dragHandleProps}
                         {...provided.draggableProps}
                         style={dynamicCardStyle}
-                        onClick={props.overlayCallback}
+                        onClick={() => overlayCallback(props)}
                     >
-                        <p className="fs-3 mt-0 mb-1">{props.data.title}</p>
-                        <Image type={props.data.type} />
+                        <p className="fs-3 mt-0 mb-1">{props.title}</p>
+                        <Image type={props.type} />
                     </div>
                 );
             }}

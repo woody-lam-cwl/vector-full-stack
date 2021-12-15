@@ -1,9 +1,8 @@
-import CardData from './cardData';
+import CardProps from './cardProps';
 
 interface CardRowContainerProps {
-    cards: CardData[];
+    cards: CardProps[];
     rowIndex: number;
-    overlayCallback: (card: CardData) => void;
 }
 
 export default CardRowContainerProps;

@@ -8,12 +8,13 @@ import {
     updateAllCardsToServer,
 } from './httpRequest';
 import CardRowContainer from './components/cardRowContainer';
-import CardData from './interfaces/cardData';
+import CardData from './interfaces/cardProps';
 import { cardsInRows, reorderCards, sortCard } from './appDisplayLogic';
 import Header from './components/header';
 import Overlay from './components/overlay';
 
 export const DragDisabledContext = createContext(false);
+export const OverlayCallbackContext = createContext((card: CardData) => {});
 
 const App = () => {
     const lastSavedCards = useRef<CardData[]>([]);
@@ -108,30 +109,31 @@ const App = () => {
 
     return (
         <DragDisabledContext.Provider value={isOverlayActive}>
-            <React.Fragment>
-                <Header
-                    resetCardsCallback={resetCards}
-                    secondsSinceLastSave={secondsSinceLastSave}
-                    areCardsSaving={areCardsSaving}
-                ></Header>
-                <DragDropContext onDragEnd={dragEnd}>
-                    <div className="d-flex flex-column px-5">
-                        {cardsInRows(cards).map((cards, index) => (
-                            <CardRowContainer
-                                key={index}
-                                cards={cards}
-                                rowIndex={index}
-                                overlayCallback={activateOverlay}
-                            />
-                        ))}
-                    </div>
-                </DragDropContext>
-                <Overlay
-                    isOverlayActive={isOverlayActive}
-                    overlayData={overlayData}
-                    deleteCardCallback={deleteCard}
-                />
-            </React.Fragment>
+            <OverlayCallbackContext.Provider value={activateOverlay}>
+                <React.Fragment>
+                    <Header
+                        resetCardsCallback={resetCards}
+                        secondsSinceLastSave={secondsSinceLastSave}
+                        areCardsSaving={areCardsSaving}
+                    ></Header>
+                    <DragDropContext onDragEnd={dragEnd}>
+                        <div className="d-flex flex-column px-5">
+                            {cardsInRows(cards).map((cards, index) => (
+                                <CardRowContainer
+                                    key={index}
+                                    cards={cards}
+                                    rowIndex={index}
+                                />
+                            ))}
+                        </div>
+                    </DragDropContext>
+                    <Overlay
+                        isOverlayActive={isOverlayActive}
+                        overlayData={overlayData}
+                        deleteCardCallback={deleteCard}
+                    />
+                </React.Fragment>
+            </OverlayCallbackContext.Provider>
         </DragDisabledContext.Provider>
     );
 };
