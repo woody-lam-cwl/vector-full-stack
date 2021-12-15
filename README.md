@@ -6,6 +6,8 @@ Technical project documentation can be found in [Project Architecture Documentat
 
 Thought process and design considerations are included in the documentation of each component.
 
+[Docker Documentation](documentation/docker.md) and [Further Discussions](documentation/discussions.md) can also be found in the [Documentation](documentation) folder.
+
 ---
 
 ## Part I - Front End

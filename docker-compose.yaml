@@ -14,7 +14,7 @@ services:
 
   backend:
     build: ./server/
-    image: woody-lam-cwl/full-stack-python
+    image: woodylamcwl/full-stack-python
     container_name: backend
     restart: always
     ports:
@@ -22,7 +22,7 @@ services:
 
   frontend:
     build: ./app/
-    image: woody-lam-cwl/full-stack-react
+    image: woodylamcwl/full-stack-react
     container_name: frontend
     restart: always
     ports:
